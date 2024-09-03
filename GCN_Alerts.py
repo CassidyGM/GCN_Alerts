@@ -39,14 +39,14 @@ GHO = Observer(location=bisdee_tier, name="Greenhill Observatory", timezone="Aus
 
 # Connect as a consumer.
 # Warning: don't share the client secret with others.
-consumer = Consumer(client_id='7bj5o871o827hca48lsdk5ihgr',
-                    client_secret='r89do6oaol95cetkjbkpvupe2gk2ga6s7dmoopn2sge79kbmmm8',
+consumer = Consumer(client_id='3a55lngrsah42c46ofhntenumf',
+                    client_secret='179chfu1lbg08flmq6nbiongbpaodvn14h39his89ob77jvn970t',
                     domain='gcn.nasa.gov')
 
 ## Timestamps between which you want to search for alerts
-timestamp1 = int((dt.datetime.now() - dt.timedelta(days=1)).timestamp() * 1000)
+timestamp1 = int((dt.datetime.now() - dt.timedelta(days=7)).timestamp() * 1000)
 # days=? is how many days in the past to start the search
-timestamp2 = timestamp1 + 86400000
+timestamp2 = timestamp1 + 7*86400000
 # 86400000 = +1 day from start date
 
 ## Set date range for astro plan to check observability
@@ -111,12 +111,15 @@ file_list=[]
 #path='./Obs_Events_'+today
 #if not os.path.exists(path):
 #    os.mkdir(path)
-
+topictest=['gcn.classic.text.FERMI_GBM_ALERT',
+             'gcn.classic.text.FERMI_GBM_FIN_POS',
+            'gcn.classic.text.FERMI_GBM_FLT_POS',
+            'gcn.classic.voevent.INTEGRAL_SPIACS']
 
 ##Check new alerts
 ## Start counter for how many alerts are found
 n=0
-for a in topiclist:
+for a in topictest:
     topic = a
     #print(topic)
 
@@ -129,7 +132,8 @@ for a in topiclist:
     try:
         consumer.assign(start)
         for message in consumer.consume(end[0].offset - start[0].offset, timeout=1):
-            # Prints all alert messgaes found        
+            # Prints all alert messgaes found   
+            print(message.value())     
             n=n+1
             ## Save the VOEvent files into the 'today' directory
             # Name file Alert with a number - VOEvent file
@@ -149,9 +153,9 @@ for a in topiclist:
                 ## Get RA/Dec of event (central)
                 #print(v.Who.Author.shortName.text)
                 RA=str(v.WhereWhen.ObsDataLocation.ObservationLocation.AstroCoords.Position2D.Value2.C1)
-                #print('Event Ra: '+ str(v.WhereWhen.ObsDataLocation.ObservationLocation.AstroCoords.Position2D.Value2.C1))
+                print('Event Ra: '+ RA)
                 Dec=str(v.WhereWhen.ObsDataLocation.ObservationLocation.AstroCoords.Position2D.Value2.C2)
-                #print('Event Dec: '+ str(v.WhereWhen.ObsDataLocation.ObservationLocation.AstroCoords.Position2D.Value2.C2))
+                print('Event Dec: '+ Dec)
 
                 ## Create coordinate in degrees
                 c = SkyCoord(RA, Dec, unit="deg")
@@ -209,6 +213,7 @@ if df.empty == True:
 
 
 ## Save data frame to csv file
+today = str(date.today())
 df.to_csv('Obs_events_'+today+'.txt', sep='\t', index=False)
 
 consumer.close()
