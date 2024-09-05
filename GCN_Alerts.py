@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[ ]:
+
+
 from __future__ import print_function
 import numpy as np
 import pandas as pd
@@ -38,8 +41,8 @@ GHO = Observer(location=bisdee_tier, name="Greenhill Observatory", timezone="Aus
 
 # Connect as a consumer.
 # Warning: don't share the client secret with others.
-consumer = Consumer(client_id='1k3ffap716hdphq8pu0vjvu2dv',
-                    client_secret='1q5eo7ah7cs53dg0va2pjsb9h2i16oig74phurcuj3bprhe9voga',
+consumer = Consumer(client_id='62gmdj5cl4mlb1qlavmddi3glf',
+                    client_secret='s53njtrehg8m72d15jov06ugvptoce9obnk5vbng2veikke8jdm',
                     domain='gcn.nasa.gov')
 
 ## Timestamps between which you want to search for alerts
@@ -55,9 +58,8 @@ date2=date1+dt.timedelta(days=3)
 time_range = Time([str(date1), str(date2)])
 ## Constrain to observable angles and during local night time
 constraints = [AltitudeConstraint(10*u.deg, 80*u.deg),
-               AirmassConstraint(3), AtNightConstraint.twilight_nautical()]
+               AirmassConstraint(5), AtNightConstraint.twilight_nautical()]
 
-## List the GCN alert streams to be searched
 ## List the GCN alert streams to be searched
 topiclist = ['gcn.classic.voevent.FERMI_GBM_SUBTHRESH',
              'gcn.classic.voevent.FERMI_GBM_FIN_POS',
@@ -154,7 +156,7 @@ for a in topiclist:
 
 
             ## Delete the VOEvent files
-            os.remove(datafilename)
+            #os.remove(datafilename)
 
     ## Except to ignore error that occurs when there are no new alerts
     except ValueError: 
@@ -171,5 +173,6 @@ if df.empty == True:
 
 today = str(date.today())
 df.to_csv('Obs_events_'+today+'.txt', sep='\t', index=False)
+
 
 consumer.close()
